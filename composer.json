@@ -1,17 +1,21 @@
 {
-    "name": "clubfixinsurtech/valorempay",
-    "description": "Integração com o Gateway de Pagamento ValoremPay",
-    "minimum-stability": "dev",
-    "autoload": {
-        "psr-4": {
-            "ValoremPay\\": "src/"
-        }
-    },
-    "require": {
-       "php": "^8.1",
-        "saloonphp/saloon": "^3.0"
-    },
-    "require-dev": {
-        "symfony/var-dumper": "^6.2"
+  "name": "clubfixinsurtech/valorempay",
+  "description": "Integração com o Gateway de Pagamento ValoremPay",
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "ValoremPay\\": "src/"
     }
+  },
+  "require": {
+    "php": "^8.1",
+    "saloonphp/saloon": "^3.0"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^6.3",
+    "phpunit/phpunit": "^10.4"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit --colors=always --testdox"
+  }
 }

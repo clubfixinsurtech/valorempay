@@ -2,7 +2,7 @@
 
 namespace ValoremPay\Helpers;
 
-namespace ValoremPay\Exceptions\ValidatorException;
+use ValoremPay\Exceptions\ValidatorException;
 
 class Validator
 {

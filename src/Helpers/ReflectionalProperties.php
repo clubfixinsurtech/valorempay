@@ -13,10 +13,12 @@ class ReflectionalProperties
         $filledReflectionalProperties = array_filter(
             $properties,
             function (\ReflectionProperty $property) use ($class) {
-            if (!empty($value = $class->{$property->name})) {
-                return $value;
+                if (!empty($value = $class->{$property->name})) {
+                    return $value;
+                }
+                return null;
             }
-        });
+        );
 
         $filledProperties = [];
 

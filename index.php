@@ -2,56 +2,81 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-// =====================================================================
+##############################
+## SETUP
+##############################
 
-// SETUP
+$clientId = '';
+$clientSecret = '';
 
-$asaasKey = '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwMzkxNDY6OiRhYWNoXzgxMTk2NDg4LTU4YmItNGY2ZC1hNGY2LTU1ZWMzNTE4ZDQ1Zg==';
+$connector = new \ValoremPay\ValoremPayConnector(clientId: $clientId, clientSecret: $clientSecret);
+$valoremPay = $connector->valoremPay();
 
-$connector = new \Asaas\AsaasConnector($asaasKey, false);
+##############################
+## [x] POST transactions
+##############################
 
-// =====================================================================
+$createTransaction = $valoremPay->createTransaction();
+$nit = $createTransaction->object()->payment->nit;
 
-// CUSTOMER
+//dump($createTransaction, $createTransaction->object());
 
-$customer = (new \Asaas\Entities\Customer(
-    name: 'Sergio Danilo Jr',
-    cpfCnpj: '05506426500',
-    phone: '41992885586'
-));
+##############################
+## [x] GET transaction
+##############################
 
-$response = $connector->send(new Asaas\Requests\Customer\Create($customer));
+//$getTransaction = $valoremPay->getTransaction(nit: $nit);
 
-$customerId = $response->json('id');
+//dd($getTransaction->object());
 
-// =====================================================================
+##############################
+## [x] POST payments{nit}
+##############################
 
-// CREDIT CARD
+//$card = new \ValoremPay\ValueObjects\Card(number: '5448280000000007', expiryDate: '0128', securityCode: '123');
+//$createPayment = $valoremPay->createPayment(nit: $nit, card: $card);
 
-// =====================================================================
+//dd($createPayment->object());
 
-// PAYMENT
-$dueDate = (new DateTime())
-    ->setTimezone((new DateTimeZone("America/Sao_Paulo")))
-    ->setTime(0, 0);
+##############################
+## [] PUT payments{nit}
+##############################
 
-$payment = (new \Asaas\Entities\Payment(
-    customer: $customerId,
-    value: 12.5,
-    dueDate: $dueDate,
-    billingType: \Asaas\Enums\BillingType::BOLETO
-))->when(
-        true,
-        function (\Asaas\Entities\Payment $payment) {
-            $payment->remoteIp('127.0.0.1');
-        }
-    )->withCardToken('baguá');
+$confirmPayment = $valoremPay->confirmPayment(nit: $nit); // TODO: Check if this is working
 
-$request = new \Asaas\Requests\Payments\Create($payment);
-$response = $connector->send($request);
+dump($confirmPayment, $confirmPayment->object());
 
-dd(
-    $response->status(),
-    $response->clientError(),
-    $response->json(),
-);
+##############################
+## [] POST cancellations
+##############################
+
+$createCancellation = $valoremPay->createCancellation(nit: $nit); // TODO: Check if this is working
+
+dump($createCancellation, $createCancellation->object());
+
+##############################
+## [] PUT cancellations
+##############################
+
+$confirmCancellation = $valoremPay->confirmCancellation(nit: $nit); // TODO: Check if this is working
+
+dump($confirmCancellation, $confirmCancellation->object());
+
+##############################
+## [x] POST store-sync
+##############################
+
+//$storeSync = $valoremPay->storeSync(merchantUsn: '123456', customerId: '123456789');
+//$nita = $storeSync->object()->body->nita;
+//$storeToken = $storeSync->object()->body->store_token;
+
+//dd($storeSync, $storeSync->object());
+
+##############################
+## [x] PUT store-sync
+##############################
+
+//$storeSyncPut = $valoremPay->storeSyncPut(nita: $nita, storeToken: $storeToken);
+
+//dd($storeSyncPut->object());
+
