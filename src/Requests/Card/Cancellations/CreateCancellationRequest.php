@@ -1,13 +1,13 @@
 <?php
 
-namespace ValoremPay\Requests\Card;
+namespace ValoremPay\Requests\Card\Cancellations;
 
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
 
-class CancellationCreationRequest extends Request implements HasBody
+class CreateCancellationRequest extends Request implements HasBody
 {
     use HasJsonBody;
 

@@ -1,21 +1,23 @@
 <?php
 
-namespace ValoremPay\Requests\Card;
+namespace ValoremPay\Requests\Card\StoreSync;
 
 use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
+use ValoremPay\Entities\Card;
 
-class StoreSyncRequest extends Request implements HasBody
+class SyncCreditCardStorageRequest extends Request implements HasBody
 {
     use HasJsonBody;
 
-    protected Method $method = Method::POST;
+    protected Method $method = Method::PUT;
 
     public function __construct(
-        protected string $merchantUsn,
-        protected string $customerId,
+        protected string $nita,
+        protected string $storeToken,
+        protected Card   $card,
     )
     {
         //
@@ -23,7 +25,7 @@ class StoreSyncRequest extends Request implements HasBody
 
     public function resolveEndpoint(): string
     {
-        return '/gse-tef-v2/store-sync';
+        return '/gse-tef-v2/store-sync/' . $this->nita;
     }
 
     protected function defaultHeaders(): array
@@ -31,14 +33,14 @@ class StoreSyncRequest extends Request implements HasBody
         return [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
+            'store_token' => $this->storeToken,
         ];
     }
 
     protected function defaultBody(): array
     {
         return [
-            'merchant_usn' => $this->merchantUsn,
-            'customer_id' => $this->customerId,
+            'card' => $this->card->toArray(),
         ];
     }
 }

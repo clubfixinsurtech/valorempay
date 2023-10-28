@@ -1,11 +1,11 @@
 <?php
 
-namespace ValoremPay\Requests\Card;
+namespace ValoremPay\Requests\Card\Transactions;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 
-class TransactionViewerRequest extends Request
+class GetTransactionRequest extends Request
 {
     protected Method $method = Method::GET;
 

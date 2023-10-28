@@ -1,11 +1,11 @@
 <?php
 
-namespace ValoremPay\Requests\Card;
+namespace ValoremPay\Requests\Card\Payments;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 
-class PaymentConfirmationRequest extends Request
+class ProcessPaymentLaterRequest extends Request
 {
     protected Method $method = Method::PUT;
 

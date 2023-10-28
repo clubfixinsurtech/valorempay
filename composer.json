@@ -1,6 +1,6 @@
 {
   "name": "clubfixinsurtech/valorempay",
-  "description": "Integração com o Gateway de Pagamento ValoremPay",
+  "description": "Integração com o Gateway de Pagamento Valorem Pay",
   "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
