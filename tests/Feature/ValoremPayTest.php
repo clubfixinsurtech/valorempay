@@ -47,7 +47,7 @@ class ValoremPayTest extends TestCase
     public function test_get_transaction(): void
     {
         $createTransaction = $this->createSampleTransaction();
-        $nit = $createTransaction->object()->payment->nit;
+        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
 
         $getTransaction = $this->valoremPay->getTransaction(nit: $nit);
         $response = $getTransaction->object();
@@ -61,7 +61,7 @@ class ValoremPayTest extends TestCase
     public function test_process_payment(): void
     {
         $createTransaction = $this->createSampleTransaction();
-        $nit = $createTransaction->object()->payment->nit;
+        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
 
         $options = $this->createSamplePayment();
         $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
@@ -76,11 +76,11 @@ class ValoremPayTest extends TestCase
     public function test_process_payment_later(): void
     {
         $createTransaction = $this->createSampleTransaction(postponeConfirmation: true);
-        $nit = $createTransaction->object()->payment->nit;
+        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
 
         $options = $this->createSamplePayment();
         $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = $processPayment->object()->payment->nit;
+        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
 
         $processPaymentLater = $this->valoremPay->processPaymentLater(nit: $processPaymentNit);
         $response = $processPaymentLater->object();
@@ -94,11 +94,11 @@ class ValoremPayTest extends TestCase
     public function test_create_cancellation(): void
     {
         $createTransaction = $this->createSampleTransaction();
-        $nit = $createTransaction->object()->payment->nit;
+        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
 
         $options = $this->createSamplePayment();
         $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = $processPayment->object()->payment->nit;
+        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
 
         $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
         $response = $createCancellation->object();
@@ -114,11 +114,11 @@ class ValoremPayTest extends TestCase
         $this->markTestSkipped('This test is not working');
 
         $createTransaction = $this->createSampleTransaction(postponeConfirmation: true);
-        $nit = $createTransaction->object()->payment->nit;
+        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
 
         $options = $this->createSamplePayment();
         $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = $processPayment->object()->payment->nit;
+        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
 
         $processPaymentLater = $this->valoremPay->processPaymentLater(nit: $processPaymentNit);
 
@@ -133,14 +133,14 @@ class ValoremPayTest extends TestCase
     public function test_process_cancellation(): void
     {
         $createTransaction = $this->createSampleTransaction();
-        $nit = $createTransaction->object()->payment->nit;
+        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
 
         $options = $this->createSamplePayment();
         $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = $processPayment->object()->payment->nit;
+        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
 
         $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
-        $cancellationNit = $createCancellation->object()->cancellation_nit;
+        $cancellationNit = new \ValoremPay\Entities\Nit($createCancellation->object()->cancellation_nit);
 
         $processCancellation = $this->valoremPay->processCancellation(nit: $cancellationNit);
         $response = $processCancellation->object();

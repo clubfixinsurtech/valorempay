@@ -20,7 +20,7 @@ $createTransactionRequest = $connector->valoremPay()->createTransaction([
 $createTransactionResponse = $createTransactionRequest->object();
 
 // Get transaction
-$request = $connector->valoremPay()->getTransaction(nit: $createTransactionResponse->payment->nit);
+$request = $connector->valoremPay()->getTransaction(nit: new \ValoremPay\Entities\Nit($createTransactionResponse->payment->nit));
 $response = $request->object();
 
 dump($request, $response);

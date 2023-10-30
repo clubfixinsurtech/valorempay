@@ -4,13 +4,14 @@ namespace ValoremPay\Requests\Card\Transactions;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use ValoremPay\Entities\Nit;
 
 class GetTransactionRequest extends Request
 {
     protected Method $method = Method::GET;
 
     public function __construct(
-        protected string $nit,
+        protected Nit $nit,
     )
     {
         //

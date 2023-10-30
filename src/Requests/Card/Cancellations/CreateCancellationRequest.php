@@ -6,6 +6,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
+use ValoremPay\Entities\Nit;
 
 class CreateCancellationRequest extends Request implements HasBody
 {
@@ -14,7 +15,7 @@ class CreateCancellationRequest extends Request implements HasBody
     protected Method $method = Method::POST;
 
     public function __construct(
-        protected string $nit,
+        protected Nit $nit,
     )
     {
         //
@@ -36,7 +37,7 @@ class CreateCancellationRequest extends Request implements HasBody
     protected function defaultBody(): array
     {
         return [
-            'original_nit' => $this->nit,
+            'original_nit' => (string)$this->nit,
         ];
     }
 }

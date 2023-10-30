@@ -6,7 +6,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use ValoremPay\Entities\ProcessPayment;
+use ValoremPay\Entities\{Nit, ProcessPayment};
 
 class ProcessPaymentRequest extends Request implements HasBody
 {
@@ -15,8 +15,8 @@ class ProcessPaymentRequest extends Request implements HasBody
     protected Method $method = Method::POST;
 
     public function __construct(
-        protected string $nit,
-        protected array  $options,
+        protected Nit   $nit,
+        protected array $options,
     )
     {
         //

@@ -14,6 +14,7 @@ use ValoremPay\Requests\Card\{
     Transactions\CreateTransactionRequest,
     Transactions\GetTransactionRequest
 };
+use ValoremPay\Entities\Nit;
 
 class ValoremPayResource extends BaseResource
 {
@@ -22,27 +23,27 @@ class ValoremPayResource extends BaseResource
         return $this->connector->send(new CreateTransactionRequest($options));
     }
 
-    public function getTransaction(string $nit): Response
+    public function getTransaction(Nit $nit): Response
     {
         return $this->connector->send(new GetTransactionRequest($nit));
     }
 
-    public function processPayment(string $nit, array $options): Response
+    public function processPayment(Nit $nit, array $options): Response
     {
         return $this->connector->send(new ProcessPaymentRequest(nit: $nit, options: $options));
     }
 
-    public function processPaymentLater(string $nit, bool $confirm = true): Response
+    public function processPaymentLater(Nit $nit, bool $confirm = true): Response
     {
         return $this->connector->send(new ProcessPaymentLaterRequest(nit: $nit, confirm: $confirm));
     }
 
-    public function createCancellation(string $nit): Response
+    public function createCancellation(Nit $nit): Response
     {
         return $this->connector->send(new CreateCancellationRequest(nit: $nit));
     }
 
-    public function processCancellation(string $nit): Response
+    public function processCancellation(Nit $nit): Response
     {
         return $this->connector->send(new ProcessCancellationRequest(nit: $nit));
     }

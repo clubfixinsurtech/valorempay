@@ -4,14 +4,15 @@ namespace ValoremPay\Requests\Card\Payments;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use ValoremPay\Entities\Nit;
 
 class ProcessPaymentLaterRequest extends Request
 {
     protected Method $method = Method::PUT;
 
     public function __construct(
-        protected string $nit,
-        protected bool   $confirm = true,
+        protected Nit  $nit,
+        protected bool $confirm = true,
     )
     {
         //

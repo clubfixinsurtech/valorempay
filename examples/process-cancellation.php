@@ -21,7 +21,7 @@ $createTransactionResponse = $createTransactionRequest->object();
 
 // Process payment
 $processPaymentRequest = $connector->valoremPay()->processPayment(
-    nit: $createTransactionResponse->payment->nit,
+    nit: new \ValoremPay\Entities\Nit($createTransactionResponse->payment->nit),
     options: [
         'card' => (new \ValoremPay\Entities\Card(number: '5448280000000007', expiryDate: '0128', securityCode: '123',))->toArray(),
     ],
@@ -29,11 +29,11 @@ $processPaymentRequest = $connector->valoremPay()->processPayment(
 $processPaymentResponse = $processPaymentRequest->object();
 
 // Create cancellation
-$createCancellationRequest = $connector->valoremPay()->createCancellation(nit: $processPaymentResponse->payment->nit);
+$createCancellationRequest = $connector->valoremPay()->createCancellation(nit: new \ValoremPay\Entities\Nit($processPaymentResponse->payment->nit));
 $createCancellationResponse = $createCancellationRequest->object();
 
 // Process cancellation
-$request = $connector->valoremPay()->processCancellation(nit: $createCancellationResponse->cancellation_nit);
+$request = $connector->valoremPay()->processCancellation(nit: new \ValoremPay\Entities\Nit($createCancellationResponse->cancellation_nit));
 $response = $request->object();
 
 dump($request, $response);

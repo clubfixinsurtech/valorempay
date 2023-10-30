@@ -4,13 +4,14 @@ namespace ValoremPay\Requests\Card\Cancellations;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use ValoremPay\Entities\Nit;
 
 class ProcessCancellationRequest extends Request
 {
     protected Method $method = Method::PUT;
 
     public function __construct(
-        protected string $nit,
+        protected Nit $nit,
     )
     {
         //

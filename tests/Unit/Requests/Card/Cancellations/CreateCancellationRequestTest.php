@@ -9,7 +9,9 @@ class CreateCancellationRequestTest extends RequestTestCase
 {
     protected function requestClass(): Request
     {
-        return new \ValoremPay\Requests\Card\Cancellations\CreateCancellationRequest('');
+        return new \ValoremPay\Requests\Card\Cancellations\CreateCancellationRequest(
+            nit: new \ValoremPay\Entities\Nit('8a910e3e524986e0f121231bb0dcfc420996be66481819b075a568f87f7550b1'),
+        );
     }
 
     protected function expectedRequestMethod(): string

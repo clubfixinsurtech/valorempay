@@ -9,7 +9,10 @@ class ProcessPaymentLaterRequestTest extends RequestTestCase
 {
     protected function requestClass(): Request
     {
-        return new \ValoremPay\Requests\Card\Payments\ProcessPaymentLaterRequest('', '');
+        return new \ValoremPay\Requests\Card\Payments\ProcessPaymentLaterRequest(
+            nit: new \ValoremPay\Entities\Nit('8a910e3e524986e0f121231bb0dcfc420996be66481819b075a568f87f7550b1'),
+            confirm: false,
+        );
     }
 
     protected function expectedRequestMethod(): string
