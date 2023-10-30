@@ -17,25 +17,9 @@ use ValoremPay\Requests\Card\{
 
 class ValoremPayResource extends BaseResource
 {
-    public function createTransaction(
-        int    $installments,
-        int    $installmentType,
-        int    $amount,
-        string $softDescriptor,
-        string $statusNotificationUrl,
-        bool   $useDecisionManager = false,
-        bool   $postponeConfirmation = false
-    ): Response
+    public function createTransaction(array $options): Response
     {
-        return $this->connector->send(new CreateTransactionRequest(
-            installments: $installments,
-            installmentType: $installmentType,
-            amount: $amount,
-            softDescriptor: $softDescriptor,
-            statusNotificationUrl: $statusNotificationUrl,
-            useDecisionManager: $useDecisionManager,
-            postponeConfirmation: $postponeConfirmation,
-        ));
+        return $this->connector->send(new CreateTransactionRequest($options));
     }
 
     public function getTransaction(string $nit): Response
@@ -43,9 +27,9 @@ class ValoremPayResource extends BaseResource
         return $this->connector->send(new GetTransactionRequest($nit));
     }
 
-    public function processPayment(string $nit, Card $card): Response
+    public function processPayment(string $nit, array $options): Response
     {
-        return $this->connector->send(new ProcessPaymentRequest(nit: $nit, card: $card));
+        return $this->connector->send(new ProcessPaymentRequest(nit: $nit, options: $options));
     }
 
     public function processPaymentLater(string $nit, bool $confirm = true): Response

@@ -6,7 +6,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use ValoremPay\Entities\Card;
+use ValoremPay\Entities\ProcessPayment;
 
 class ProcessPaymentRequest extends Request implements HasBody
 {
@@ -16,7 +16,7 @@ class ProcessPaymentRequest extends Request implements HasBody
 
     public function __construct(
         protected string $nit,
-        protected Card   $card,
+        protected array  $options,
     )
     {
         //
@@ -37,8 +37,6 @@ class ProcessPaymentRequest extends Request implements HasBody
 
     protected function defaultBody(): array
     {
-        return [
-            'card' => $this->card->toArray(),
-        ];
+        return (new ProcessPayment($this->options))->toArray();
     }
 }

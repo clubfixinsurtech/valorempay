@@ -22,7 +22,7 @@ class BasicAuth extends Request
         return '/gmac-v1/oauth2/token';
     }
 
-    public function defaultHeaders(): array
+    protected function defaultHeaders(): array
     {
         return [
             'Authorization' => 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret),

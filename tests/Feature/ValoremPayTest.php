@@ -10,24 +10,24 @@ class ValoremPayTest extends TestCase
 
     protected function assertPreConditions(): void
     {
-        $credentialsFile = dirname(__DIR__, 2) . '/examples/config.php';
+        $configFile = dirname(__DIR__, 2) . '/examples/config.php';
 
-        $this->assertCredentialsFileExists($credentialsFile);
+        $this->assertConfigFileExists($configFile);
 
-        $credentials = include $credentialsFile;
+        $config = include $configFile;
 
-        $this->assertArrayHasKey('client_id', $credentials, 'Client ID is missing in credentials');
-        $this->assertNotEmpty($credentials['client_id'], 'Client ID is empty');
+        $this->assertArrayHasKey('client_id', $config, 'Client ID is missing in config');
+        $this->assertNotEmpty($config['client_id'], 'Client ID is empty');
 
-        $this->assertArrayHasKey('client_secret', $credentials, 'Client secret is missing in credentials');
-        $this->assertNotEmpty($credentials['client_secret'], 'Client secret is empty');
+        $this->assertArrayHasKey('client_secret', $config, 'Client secret is missing in config');
+        $this->assertNotEmpty($config['client_secret'], 'Client secret is empty');
     }
 
     protected function setUp(): void
     {
-        $credentials = include dirname(__DIR__, 2) . '/examples/config.php';
-        $clientId = $credentials['client_id'];
-        $clientSecret = $credentials['client_secret'];
+        $config = include dirname(__DIR__, 2) . '/examples/config.php';
+        $clientId = $config['client_id'];
+        $clientSecret = $config['client_secret'];
 
         $connector = new \ValoremPay\ValoremPayConnector(clientId: $clientId, clientSecret: $clientSecret);
         $this->valoremPay = $connector->valoremPay();
@@ -63,8 +63,8 @@ class ValoremPayTest extends TestCase
         $createTransaction = $this->createSampleTransaction();
         $nit = $createTransaction->object()->payment->nit;
 
-        $card = $this->createSampleCard();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, card: $card);
+        $options = $this->createSamplePayment();
+        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
         $response = $processPayment->object();
 
         $this->assertIsObject($response);
@@ -78,8 +78,8 @@ class ValoremPayTest extends TestCase
         $createTransaction = $this->createSampleTransaction(postponeConfirmation: true);
         $nit = $createTransaction->object()->payment->nit;
 
-        $card = $this->createSampleCard();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, card: $card);
+        $options = $this->createSamplePayment();
+        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
         $processPaymentNit = $processPayment->object()->payment->nit;
 
         $processPaymentLater = $this->valoremPay->processPaymentLater(nit: $processPaymentNit);
@@ -96,8 +96,8 @@ class ValoremPayTest extends TestCase
         $createTransaction = $this->createSampleTransaction();
         $nit = $createTransaction->object()->payment->nit;
 
-        $card = $this->createSampleCard();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, card: $card);
+        $options = $this->createSamplePayment();
+        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
         $processPaymentNit = $processPayment->object()->payment->nit;
 
         $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
@@ -116,8 +116,8 @@ class ValoremPayTest extends TestCase
         $createTransaction = $this->createSampleTransaction(postponeConfirmation: true);
         $nit = $createTransaction->object()->payment->nit;
 
-        $card = $this->createSampleCard();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, card: $card);
+        $options = $this->createSamplePayment();
+        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
         $processPaymentNit = $processPayment->object()->payment->nit;
 
         $processPaymentLater = $this->valoremPay->processPaymentLater(nit: $processPaymentNit);
@@ -135,8 +135,8 @@ class ValoremPayTest extends TestCase
         $createTransaction = $this->createSampleTransaction();
         $nit = $createTransaction->object()->payment->nit;
 
-        $card = $this->createSampleCard();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, card: $card);
+        $options = $this->createSamplePayment();
+        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
         $processPaymentNit = $processPayment->object()->payment->nit;
 
         $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
@@ -178,9 +178,9 @@ class ValoremPayTest extends TestCase
         $this->assertObjectHasAttribute('nita', $response->body);
     }
 
-    private function assertCredentialsFileExists(string $filePath): void
+    private function assertConfigFileExists(string $filePath): void
     {
-        $this->assertTrue(file_exists($filePath), 'File credentials.php does not exist');
+        $this->assertTrue(file_exists($filePath), 'File config.php does not exist');
     }
 
     private function assertObjectHasAttribute(string $attribute, object $object): void
@@ -195,18 +195,34 @@ class ValoremPayTest extends TestCase
 
     private function createSampleTransaction(bool $postponeConfirmation = false): \Saloon\Http\Response
     {
-        return $this->valoremPay->createTransaction(
-            installments: 1,
-            installmentType: 4,
-            amount: 1000,
-            softDescriptor: 'Lorem ipsum dolor.',
-            statusNotificationUrl: 'https://example.com',
-            postponeConfirmation: $postponeConfirmation
-        );
+        $options = [
+            'installments' => 1,
+            'installment_type' => 4,
+            'amount' => 1000,
+            'soft_descriptor' => 'Lorem ipsum dolor',
+            'additional_data' => [
+                'status_notification_url' => 'https://example.com',
+                'use_decision_manager' => false,
+                'postpone_confirmation' => false,
+            ],
+        ];
+
+        if ($postponeConfirmation) {
+            $options['additional_data']['postpone_confirmation'] = true;
+        }
+
+        return $this->valoremPay->createTransaction($options);
     }
 
     private function createSampleCard(): \ValoremPay\Entities\Card
     {
         return new \ValoremPay\Entities\Card(number: '5448280000000007', expiryDate: '0128', securityCode: '123');
+    }
+
+    private function createSamplePayment(): array
+    {
+        return [
+            'card' => $this->createSampleCard()->toArray(),
+        ];
     }
 }
