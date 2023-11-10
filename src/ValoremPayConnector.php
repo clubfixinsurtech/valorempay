@@ -10,6 +10,7 @@ class ValoremPayConnector extends Connector
     public function __construct(
         private readonly string $clientId,
         private readonly string $clientSecret,
+        private readonly bool   $isSandbox = true,
     )
     {
         $this->requestAndSetAuthToken();
@@ -17,7 +18,11 @@ class ValoremPayConnector extends Connector
 
     public function resolveBaseUrl(): string
     {
-        return 'https://api-hml.gsurfnet.com';
+        if ($this->isSandbox === true) {
+            return 'https://api-hml.gsurfnet.com';
+        }
+
+        return 'https://api.gsurfnet.com';
     }
 
     public function valoremPay(): ValoremPayResource
@@ -41,6 +46,6 @@ class ValoremPayConnector extends Connector
             throw new \Exception('Failed to get token');
         }
 
-        $this->withTokenAuth($response->object()->access_token);
+        $this->withTokenAuth($response->json('access_token'));
     }
 }
