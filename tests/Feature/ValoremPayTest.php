@@ -35,145 +35,141 @@ class ValoremPayTest extends TestCase
 
     public function test_create_transaction(): void
     {
-        $createTransaction = $this->createSampleTransaction();
-        $response = $createTransaction->object();
+        $transactionCreate = $this->createSampleTransaction();
+        $response = $transactionCreate->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(201, $createTransaction);
+        $this->assertStatus(201, $transactionCreate);
         $this->assertObjectHasAttribute('payment', $response);
         $this->assertObjectHasAttribute('nit', $response->payment);
     }
 
     public function test_get_transaction(): void
     {
-        $createTransaction = $this->createSampleTransaction();
-        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
+        $transactionCreate = $this->createSampleTransaction();
+        $transactionCreateNit = $transactionCreate->json('payment.nit');
 
-        $getTransaction = $this->valoremPay->getTransaction(nit: $nit);
-        $response = $getTransaction->object();
+        $transactionDetail = $this->valoremPay->transactionDetail(
+            nit: new \ValoremPay\Entities\Nit($transactionCreateNit),
+        );
+        $response = $transactionDetail->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(200, $getTransaction);
+        $this->assertStatus(200, $transactionDetail);
         $this->assertObjectHasAttribute('payment', $response);
         $this->assertObjectHasAttribute('nit', $response->payment);
     }
 
     public function test_process_payment(): void
     {
-        $createTransaction = $this->createSampleTransaction();
-        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
+        $transactionCreate = $this->createSampleTransaction();
+        $transactionCreateNit = $transactionCreate->json('payment.nit');
 
-        $options = $this->createSamplePayment();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $response = $processPayment->object();
+        $paymentProcess = $this->valoremPay->paymentProcess(
+            nit: new \ValoremPay\Entities\Nit($transactionCreateNit),
+            payment: (new \ValoremPay\Strategies\PaymentProcessStrategy())->setCard($this->createSampleCard()),
+        );
+        $response = $paymentProcess->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(201, $processPayment);
+        $this->assertStatus(201, $paymentProcess);
         $this->assertObjectHasAttribute('payment', $response);
         $this->assertObjectHasAttribute('nit', $response->payment);
     }
 
     public function test_process_payment_later(): void
     {
-        $createTransaction = $this->createSampleTransaction(postponeConfirmation: true);
-        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
+        $transactionCreate = $this->createSampleTransaction(postponeConfirmation: true);
+        $transactionCreateNit = $transactionCreate->json('payment.nit');
 
-        $options = $this->createSamplePayment();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
+        $paymentProcess = $this->valoremPay->paymentProcess(
+            nit: new \ValoremPay\Entities\Nit($transactionCreateNit),
+            payment: (new \ValoremPay\Strategies\PaymentProcessStrategy())->setCard($this->createSampleCard()),
+        );
+        $paymentProcessNit = $paymentProcess->json('payment.nit');
 
-        $processPaymentLater = $this->valoremPay->processPaymentLater(nit: $processPaymentNit);
-        $response = $processPaymentLater->object();
+        $paymentProcessLater = $this->valoremPay->paymentProcessLater(
+            nit: new \ValoremPay\Entities\Nit($paymentProcessNit),
+        );
+        $response = $paymentProcessLater->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(200, $processPaymentLater);
+        $this->assertStatus(200, $paymentProcessLater);
         $this->assertObjectHasAttribute('payment', $response);
         $this->assertObjectHasAttribute('nit', $response->payment);
     }
 
     public function test_create_cancellation(): void
     {
-        $createTransaction = $this->createSampleTransaction();
-        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
+        $transactionCreate = $this->createSampleTransaction();
+        $transactionCreateNit = $transactionCreate->json('payment.nit');
 
-        $options = $this->createSamplePayment();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
+        $paymentProcess = $this->valoremPay->paymentProcess(
+            nit: new \ValoremPay\Entities\Nit($transactionCreateNit),
+            payment: (new \ValoremPay\Strategies\PaymentProcessStrategy())->setCard($this->createSampleCard()),
+        );
+        $paymentProcessNit = $paymentProcess->json('payment.nit');
 
-        $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
-        $response = $createCancellation->object();
-
-        $this->assertIsObject($response);
-        $this->assertStatus(200, $createCancellation);
-        $this->assertEquals($nit, $processPaymentNit);
-        $this->assertObjectHasAttribute('cancellation_nit', $response);
-    }
-
-    public function test_create_cancellation_with_payment_later(): void
-    {
-        $this->markTestSkipped('This test is not working');
-
-        $createTransaction = $this->createSampleTransaction(postponeConfirmation: true);
-        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
-
-        $options = $this->createSamplePayment();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
-
-        $processPaymentLater = $this->valoremPay->processPaymentLater(nit: $processPaymentNit);
-
-        $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
-        $response = $createCancellation->object();
+        $cancellationCreate = $this->valoremPay->cancellationCreate(
+            nit: new \ValoremPay\Entities\Nit($paymentProcessNit),
+        );
+        $response = $cancellationCreate->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(200, $createCancellation);
+        $this->assertStatus(200, $cancellationCreate);
+        $this->assertEquals($transactionCreateNit, $paymentProcessNit);
         $this->assertObjectHasAttribute('cancellation_nit', $response);
     }
 
     public function test_process_cancellation(): void
     {
-        $createTransaction = $this->createSampleTransaction();
-        $nit = new \ValoremPay\Entities\Nit($createTransaction->object()->payment->nit);
+        $transactionCreate = $this->createSampleTransaction();
+        $transactionCreateNit = $transactionCreate->json('payment.nit');
 
-        $options = $this->createSamplePayment();
-        $processPayment = $this->valoremPay->processPayment(nit: $nit, options: $options);
-        $processPaymentNit = new \ValoremPay\Entities\Nit($processPayment->object()->payment->nit);
+        $paymentProcess = $this->valoremPay->paymentProcess(
+            nit: new \ValoremPay\Entities\Nit($transactionCreateNit),
+            payment: (new \ValoremPay\Strategies\PaymentProcessStrategy())->setCard($this->createSampleCard()),
+        );
+        $paymentProcessNit = $paymentProcess->json('payment.nit');
 
-        $createCancellation = $this->valoremPay->createCancellation(nit: $processPaymentNit);
-        $cancellationNit = new \ValoremPay\Entities\Nit($createCancellation->object()->cancellation_nit);
+        $cancellationCreate = $this->valoremPay->cancellationCreate(
+            nit: new \ValoremPay\Entities\Nit($paymentProcessNit),
+        );
+        $cancellationCreateNit = $cancellationCreate->json('cancellation_nit');
 
-        $processCancellation = $this->valoremPay->processCancellation(nit: $cancellationNit);
-        $response = $processCancellation->object();
+        $cancellationProcess = $this->valoremPay->cancellationProcess(
+            nit: new \ValoremPay\Entities\Nit($cancellationCreateNit),
+        );
+        $response = $cancellationProcess->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(200, $processCancellation);
+        $this->assertStatus(200, $cancellationProcess);
         $this->assertObjectHasAttribute('cancellation', $response);
     }
 
     public function test_credit_card_storage(): void
     {
-        $creditCardStorage = $this->valoremPay->creditCardStorage(merchantUsn: '123456', customerId: '123456789');
-        $response = $creditCardStorage->object();
+        $cardStorage = $this->valoremPay->cardStorage(merchantUsn: '123456', customerId: '123456789');
+        $response = $cardStorage->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(201, $creditCardStorage);
+        $this->assertStatus(201, $cardStorage);
         $this->assertObjectHasAttribute('body', $response);
         $this->assertObjectHasAttribute('nita', $response->body);
     }
 
     public function test_sync_credit_card_storage(): void
     {
-        $creditCardStorage = $this->valoremPay->creditCardStorage(merchantUsn: '123456', customerId: '123456789');
-        $creditCardStorageResponse = $creditCardStorage->object();
-        $nita = $creditCardStorageResponse->body->nita;
-        $storeToken = $creditCardStorageResponse->body->store_token;
+        $cardStorage = $this->valoremPay->cardStorage(merchantUsn: '123456', customerId: '123456789');
+        $nita = $cardStorage->json('body.nita');
+        $storeToken = $cardStorage->json('body.store_token');
 
         $card = $this->createSampleCard();
-        $syncCreditCardStorage = $this->valoremPay->syncCreditCardStorage(nita: $nita, storeToken: $storeToken, card: $card);
-        $response = $syncCreditCardStorage->object();
+        $cardSync = $this->valoremPay->cardSync(nita: $nita, storeToken: $storeToken, card: $card);
+        $response = $cardSync->object();
 
         $this->assertIsObject($response);
-        $this->assertStatus(200, $syncCreditCardStorage);
+        $this->assertStatus(200, $cardSync);
         $this->assertObjectHasAttribute('body', $response);
         $this->assertObjectHasAttribute('nita', $response->body);
     }
@@ -195,34 +191,20 @@ class ValoremPayTest extends TestCase
 
     private function createSampleTransaction(bool $postponeConfirmation = false): \Saloon\Http\Response
     {
-        $options = [
-            'installments' => 1,
-            'installment_type' => 4,
-            'amount' => 1000,
-            'soft_descriptor' => 'Lorem ipsum dolor',
-            'additional_data' => [
-                'status_notification_url' => 'https://example.com',
-                'use_decision_manager' => false,
-                'postpone_confirmation' => false,
-            ],
-        ];
-
-        if ($postponeConfirmation) {
-            $options['additional_data']['postpone_confirmation'] = true;
-        }
-
-        return $this->valoremPay->createTransaction($options);
+        return $this->valoremPay->transactionCreate((new \ValoremPay\Strategies\TransactionCreateStrategy(
+            installments: 1,
+            installment_type: \ValoremPay\Enums\InstallmentType::STORE_WITHOUT_INTEREST,
+            amount: 1000,
+        ))->setAdditionalData(
+            (new \ValoremPay\Entities\AdditionalData(
+                postpone_confirmation: $postponeConfirmation,
+                status_notification_url: 'example.com',
+            )),
+        ));
     }
 
     private function createSampleCard(): \ValoremPay\Entities\Card
     {
-        return new \ValoremPay\Entities\Card(number: '5448280000000007', expiryDate: '0128', securityCode: '123');
-    }
-
-    private function createSamplePayment(): array
-    {
-        return [
-            'card' => $this->createSampleCard()->toArray(),
-        ];
+        return new \ValoremPay\Entities\Card(number: '5448280000000007', expiry_date: '0128', security_code: '123',);
     }
 }

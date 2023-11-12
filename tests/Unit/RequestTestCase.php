@@ -13,8 +13,6 @@ abstract class RequestTestCase extends TestCase
 
     abstract protected function expectedEndpoint(): string;
 
-    abstract protected function expectedDefaultHeaders(): array;
-
     public function test_request_method(): void
     {
         $property = $this->getProperty();
@@ -29,12 +27,7 @@ abstract class RequestTestCase extends TestCase
 
     public function test_default_headers(): void
     {
-        $method = $this->getMethod('defaultHeaders');
-
-        $this->assertEquals(
-            $this->expectedDefaultHeaders(),
-            array_keys($method->invoke($this->requestClass()))
-        );
+        $this->checkDefault('headers');
     }
 
     public function test_default_query(): void
@@ -45,6 +38,14 @@ abstract class RequestTestCase extends TestCase
     public function test_default_body(): void
     {
         $this->checkDefault('body');
+    }
+
+    protected function assertPreConditions(): void
+    {
+        $class = substr(str_replace('Tests\Unit\\', 'ValoremPay\\', get_class($this)), 0, -4);
+
+        $this->assertTrue(class_exists($class), "Class $class does not exist");
+        $this->assertEquals($class, get_class($this->requestClass()));
     }
 
     private function getMethod(string $name): \ReflectionMethod

@@ -2,89 +2,88 @@
 
 namespace ValoremPay\Entities;
 
-final class Card
+use ValoremPay\Contracts\HasPayloadInterface;
+use ValoremPay\Traits\{ConditionableTrait, HasPayload};
+use ValoremPay\Helpers\{PropertyValidator, RequiredFields};
+
+class Card implements HasPayloadInterface
 {
+    use HasPayload, ConditionableTrait;
+
+    protected array $required = [];
+
     public function __construct(
-        private readonly ?string $number = null,
-        private readonly ?string $expiryDate = null,
-        private readonly ?string $securityCode = null,
-        private readonly ?string $token = null,
+        private ?string $number = null,
+        private ?string $expiry_date = null,
+        private ?string $security_code = null,
+        private ?string $token = null,
     )
     {
-        $this->validateCard();
+        $this->validate();
     }
 
-    public function toArray(): array
+    public function validate(): void
     {
-        if ($this->token) {
-            return [
-                'security_code' => $this->securityCode,
-                'token' => $this->token,
-            ];
-        }
-
-        return [
-            'number' => $this->number,
-            'expiry_date' => $this->expiryDate,
-            'security_code' => $this->securityCode,
-        ];
+        RequiredFields::check($this->required, $this);
+        PropertyValidator::validate($this);
     }
 
-    private function validateCard(): void
+    public function getRequired(): array
     {
-        if (!$this->securityCode) {
-            throw new \InvalidArgumentException('The security code is required');
-        }
-
-        if (!$this->token) {
-            if (!$this->number) {
-                throw new \InvalidArgumentException('The card number is required');
-            }
-
-            if (!$this->expiryDate) {
-                throw new \InvalidArgumentException('The expiry date is required');
-            }
-        }
-
-        $this->validateNumber();
-        $this->validateExpiryDate();
-        $this->validateSecurityCode();
+        return $this->required;
     }
 
-    private function validateNumber(): void
+    public function setRequired(array $required): self
     {
-        if ($this->number) {
-            if (strlen($this->number) !== 16) {
-                throw new \InvalidArgumentException('The card number must be 16 digits long');
-            }
-
-            if (!is_numeric($this->number)) {
-                throw new \InvalidArgumentException('The card number must be numeric');
-            }
-        }
+        $this->required = $required;
+        return $this;
     }
 
-    private function validateExpiryDate(): void
+    public function getNumber(): ?string
     {
-        if ($this->expiryDate) {
-            if (strlen($this->expiryDate) !== 4) {
-                throw new \InvalidArgumentException('The expiry date must be 4 digits long');
-            }
-
-            if (!is_numeric($this->expiryDate)) {
-                throw new \InvalidArgumentException('The expiry date must be numeric');
-            }
-        }
+        return $this->number;
     }
 
-    private function validateSecurityCode(): void
+    public function setNumber(string $number): self
     {
-        if (strlen($this->securityCode) !== 3) {
-            throw new \InvalidArgumentException('The security code must be 3 digits long');
-        }
+        $this->number = $number;
+        $this->validate();
+        return $this;
+    }
 
-        if (!is_numeric($this->securityCode)) {
-            throw new \InvalidArgumentException('The security code must be numeric');
-        }
+    public function getExpiryDate(): ?string
+    {
+        return $this->expiry_date;
+    }
+
+    public function setExpiryDate(string $expiry_date): self
+    {
+        $this->expiry_date = $expiry_date;
+        $this->validate();
+        return $this;
+    }
+
+    public function getSecurityCode(): ?string
+    {
+        return $this->security_code;
+    }
+
+    public function setSecurityCode(string $security_code): self
+    {
+        $this->security_code = $security_code;
+        $this->validate();
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
+        $this->validate();
+        return $this;
     }
 }

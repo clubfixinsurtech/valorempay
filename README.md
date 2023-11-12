@@ -50,21 +50,22 @@ Para obter mais detalhes sobre como utilizar, consulte a pasta "examples" no dir
 
 $clientId = '';
 $clientSecret = '';
+$isSandbox = true;
 
-$connector = new \ValoremPay\ValoremPayConnector(clientId: $clientId, clientSecret: $clientSecret);
+$connector = new \ValoremPay\ValoremPayConnector(clientId: $clientId, clientSecret: $clientSecret, isSandbox: $isSandbox);
 
 // Create transaction
-$request = $connector->valoremPay()->createTransaction([
-    'installments' => 1,
-    'installment_type' => 4,
-    'amount' => 1000,
-    'soft_descriptor' => 'Lorem ipsum dolor',
-    'additional_data' => [
-        'status_notification_url' => 'https://example.com',
-        'use_decision_manager' => false,
-        'postpone_confirmation' => false,
-    ],
-]));
+$transaction = (new \ValoremPay\Strategies\TransactionCreateStrategy(
+    installments: 1,
+    installment_type: \ValoremPay\Enums\InstallmentType::STORE_WITHOUT_INTEREST,
+    amount: 1000,
+))->setAdditionalData(
+    (new \ValoremPay\Entities\AdditionalData(
+        status_notification_url: 'example.com',
+    )),
+);
+
+$request = $connector->valoremPay()->transactionCreate($transaction);
 $response = $request->object();
 
 dump($request, $response);
