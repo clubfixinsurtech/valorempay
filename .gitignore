@@ -1,2 +1,8 @@
-vendor/
+/.phpunit.cache
+/vendor
+/composer.lock
 .env
+.phpunit.result.cache
+/.idea
+/.vscode
+/examples/config.php
