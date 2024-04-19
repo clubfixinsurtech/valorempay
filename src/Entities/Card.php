@@ -8,7 +8,10 @@ use ValoremPay\Helpers\{PropertyValidator, RequiredFields};
 
 class Card implements HasPayloadInterface
 {
-    use HasPayload, ConditionableTrait;
+    use HasPayload {
+        payload as protected traitPayload;
+    }
+    use ConditionableTrait;
 
     protected array $required = [];
 
@@ -85,5 +88,16 @@ class Card implements HasPayloadInterface
         $this->token = $token;
         $this->validate();
         return $this;
+    }
+
+    public function payload(): array
+    {
+        $payload = $this->traitPayload();
+
+        if ($this->token) {
+            unset($payload['number'], $payload['expiry_date']);
+        }
+
+        return $payload;
     }
 }
